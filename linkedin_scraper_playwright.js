@@ -36,7 +36,10 @@ async function loadCredentials() {
 
 // Sanitize filename
 function sanitizeFilename(text) {
-  return text.replace(/[<>:"/\\|?*]/g, '').trim().substring(0, 100) || 'untitled';
+  return text.replace(/[<>:"/\\|?*]/g, '')
+    .trim()
+    .substring(0, 100)
+    .replace(/\s+/g, '_') || 'untitled';
 }
 
 // Format date
@@ -252,12 +255,29 @@ async function scrapeLinkedIn() {
         jobLinks = await page.$$('.job-card-container__link');
         if (i >= jobLinks.length) break;
         
+        // Get the job link URL before clicking
+        let jobUrl = '';
+        try {
+          jobUrl = await jobLinks[i].getAttribute('href');
+          if (jobUrl && !jobUrl.startsWith('http')) {
+            jobUrl = 'https://www.linkedin.com' + jobUrl;
+          }
+        } catch (e) {
+          console.log('Could not get job URL');
+        }
+        
         // Click job link
         await jobLinks[i].click();
         
         // Wait for details to load
         await page.waitForSelector('div.jobs-search__job-details--wrapper', { timeout: 10000 });
         await page.waitForTimeout(2000);
+        
+        // Get current URL after navigation (might be different from href)
+        const currentUrl = page.url();
+        if (currentUrl && currentUrl.includes('/jobs/view/')) {
+          jobUrl = currentUrl;
+        }
         
         // Get job details
         const jobDetails = await page.$('div.jobs-search__job-details--wrapper');
@@ -288,6 +308,7 @@ async function scrapeLinkedIn() {
         const content = `# ${jobTitle.trim()}\n\n` +
           `*Scraped on: ${new Date().toLocaleString()}*\n\n` +
           `*Keywords: ${options.keywords}*\n\n` +
+          `*URL: ${jobUrl}*\n\n` +
           `---\n\n` +
           markdown;
         

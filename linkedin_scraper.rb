@@ -272,8 +272,22 @@ class LinkedInScraper
           job_links = all(selectors.first)
           next if i >= job_links.count
           
+          # Get the job URL before clicking
+          job_url = ''
+          begin
+            job_url = job_links[i][:href]
+            job_url = "https://www.linkedin.com#{job_url}" unless job_url.start_with?('http')
+          rescue
+            puts "Could not get job URL"
+          end
+          
           # Click the job link
           job_links[i].click
+          
+          # Get current URL after navigation (might be different)
+          sleep 1
+          current_url = current_url
+          job_url = current_url if current_url.include?('/jobs/view/')
           
           # Wait for job details to load
           details_loaded = false
@@ -332,6 +346,8 @@ class LinkedInScraper
             f.puts "*Scraped on: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}*"
             f.puts
             f.puts "*Keywords: #{@keywords}*"
+            f.puts
+            f.puts "*URL: #{job_url}*"
             f.puts
             f.puts "---"
             f.puts
@@ -514,7 +530,9 @@ class LinkedInScraper
   end
   
   def sanitize_filename(text)
-    text.gsub(/[<>:\"\/\\|?*]/, '').strip[0..100] || 'untitled'
+    text.gsub(/[<>:\"\/\\|?*]/, '')
+      .strip[0..100]
+      .gsub(/\s+/, '_') || 'untitled'
   end
 end
 
