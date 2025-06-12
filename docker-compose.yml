@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  scraper:
+    build: .
+    volumes:
+      - ./scraped_jobs:/app/scraped_jobs
+      - ./linkedin_creds.json:/app/linkedin_creds.json:ro
+    environment:
+      - DISPLAY=${DISPLAY:-}
+    # For running with display on macOS/Linux (optional)
+    # volumes:
+    #   - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    # network_mode: host
+    command: ["-k", "ruby on rails"]

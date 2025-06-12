@@ -1,13 +1,16 @@
 {
-  "name": "linkedin-jobs-scraper",
+  "name": "linkedin-jobs-scraper-playwright",
   "version": "1.0.0",
-  "description": "LinkedIn jobs scraper",
-  "main": "linkedin_scraper.js",
+  "description": "LinkedIn jobs scraper using Playwright in Docker",
+  "main": "linkedin_scraper_playwright.js",
   "scripts": {
-    "start": "node linkedin_scraper.js"
+    "start": "node linkedin_scraper_playwright.js"
   },
   "dependencies": {
-    "puppeteer": "^21.11.0",
-    "turndown": "^7.2.0"
+    "playwright": "1.48.0",
+    "commander": "^11.1.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
