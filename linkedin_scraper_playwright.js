@@ -282,6 +282,15 @@ async function scrapeLinkedIn() {
           jobUrl = currentUrl;
         }
         
+        // Trim URL to just the job ID format and extract OfferID
+        let offerId = '';
+        const jobIdMatch = jobUrl.match(/\/jobs\/view\/(\d+)/);
+        if (jobIdMatch) {
+          const jobId = jobIdMatch[1];
+          jobUrl = `https://www.linkedin.com/jobs/view/${jobId}/`;
+          offerId = `LN-${jobId}`;
+        }
+        
         // Get job details
         const jobDetails = await page.$('div.jobs-search__job-details--wrapper');
         if (!jobDetails) {
@@ -298,6 +307,27 @@ async function scrapeLinkedIn() {
         
         console.log('Job title:', jobTitle.trim());
         
+        // Get company name
+        let companyName = '';
+        try {
+          const companyElement = await jobDetails.$('div.job-details-jobs-unified-top-card__company-name > a');
+          if (companyElement) {
+            companyName = await companyElement.textContent();
+            companyName = companyName.trim();
+          } else {
+            // Try alternative selector
+            const altCompanyElement = await jobDetails.$('div.job-details-jobs-unified-top-card__company-name');
+            if (altCompanyElement) {
+              companyName = await altCompanyElement.textContent();
+              companyName = companyName.trim();
+            }
+          }
+        } catch (e) {
+          console.log('Could not extract company name');
+        }
+        
+        console.log('Company:', companyName || 'N/A');
+        
         // Get HTML content
         const jobHtml = await jobDetails.innerHTML();
         
@@ -311,6 +341,8 @@ async function scrapeLinkedIn() {
         const content = `# ${jobTitle.trim()}\n\n` +
           `*Scraped on: ${new Date().toLocaleString()}*\n\n` +
           `*Keywords: ${options.keywords}*\n\n` +
+          `*OfferID: ${offerId}*\n\n` +
+          `*Company: ${companyName || 'N/A'}*\n\n` +
           `*URL: ${jobUrl}*\n\n` +
           `---\n\n` +
           markdown;
@@ -322,7 +354,9 @@ async function scrapeLinkedIn() {
         // Collect data for Google Sheets if enabled
         if (options.googleSheet) {
           sheetsData.push({
+            offerId: offerId,
             title: jobTitle.trim(),
+            company: companyName || 'N/A',
             url: jobUrl,
             markdown: markdown
           });

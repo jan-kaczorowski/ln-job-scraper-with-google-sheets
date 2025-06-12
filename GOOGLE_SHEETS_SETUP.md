@@ -63,8 +63,10 @@ node linkedin_scraper_playwright.js -k "ruby on rails" --google-sheet "YOUR_SHEE
 
 The scraper will automatically create headers in the first row if they don't exist:
 - **created_at**: Timestamp when the job was scraped
+- **offer_id**: Unique identifier (format: LN-XXXXXX where X is the LinkedIn job ID)
 - **job_title**: Title of the job position
-- **url**: Direct link to the job posting
+- **company**: Company name
+- **url**: Direct link to the job posting (trimmed to format: https://www.linkedin.com/jobs/view/ID/)
 - **markdown_content**: Full job description in markdown format
 - **status**: Always set to "pending" (you can update this manually)
 
@@ -94,6 +96,7 @@ If you're running this on Google Cloud Platform (GCP), you can use Application D
 ## Data Management Tips
 
 - The scraper always appends new data; it doesn't check for duplicates
-- You can add additional columns after column E for your own tracking
+- You can add additional columns after column G for your own tracking
 - Use Google Sheets filters and sorting to manage the data
 - Consider creating a second sheet for processed jobs
+- The offer_id column makes it easy to identify and track specific jobs

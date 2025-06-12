@@ -57,7 +57,7 @@ class GoogleSheetsIntegration {
       console.log(`Appending to sheet: ${sheetName}`);
       
       // Check if headers exist
-      const range = `${sheetName}!A1:E1`;
+      const range = `${sheetName}!A1:G1`;
       const existingData = await this.sheets.spreadsheets.values.get({
         spreadsheetId,
         range,
@@ -70,13 +70,13 @@ class GoogleSheetsIntegration {
           range,
           valueInputOption: 'RAW',
           requestBody: {
-            values: [['created_at', 'job_title', 'url', 'markdown_content', 'status']],
+            values: [['created_at', 'offer_id', 'job_title', 'company', 'url', 'markdown_content', 'status']],
           },
         });
       }
       
       // Append data
-      const appendRange = `${sheetName}!A:E`;
+      const appendRange = `${sheetName}!A:G`;
       const response = await this.sheets.spreadsheets.values.append({
         spreadsheetId,
         range: appendRange,
@@ -96,10 +96,10 @@ class GoogleSheetsIntegration {
 
   formatJobForSheet(job) {
     const created_at = new Date().toISOString();
-    const { title, url, markdown } = job;
+    const { offerId, title, company, url, markdown } = job;
     const status = 'pending';
     
-    return [created_at, title, url, markdown, status];
+    return [created_at, offerId, title, company, url, markdown, status];
   }
 }
 

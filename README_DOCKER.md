@@ -75,8 +75,10 @@ Scraped jobs are saved as Markdown files in the `scraped_jobs` directory.
 
 If Google Sheets integration is enabled, data is also sent to the specified Google Sheet with columns:
 - created_at
+- offer_id (format: LN-XXXXXX)
 - job_title
-- url
+- company
+- url (trimmed to format: https://www.linkedin.com/jobs/view/ID/)
 - markdown_content
 - status (always "pending")
 
