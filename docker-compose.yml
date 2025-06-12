@@ -12,4 +12,4 @@ services:
     # volumes:
     #   - /tmp/.X11-unix:/tmp/.X11-unix:rw
     # network_mode: host
-    command: ["-k", "ruby on rails"]
+    command: ["-s", "linkedin", "-k", "ruby on rails"]

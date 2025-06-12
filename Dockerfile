@@ -11,8 +11,9 @@ COPY package*.json ./
 RUN npm install
 
 # Copy application files
-COPY linkedin_scraper_playwright.js .
+COPY job_scraper.js .
 COPY google_sheets.js .
+COPY src/ ./src/
 COPY linkedin_creds.json* ./
 COPY google_service_account.json* ./
 
@@ -23,4 +24,4 @@ RUN mkdir -p scraped_jobs
 USER pwuser
 
 # Default command
-ENTRYPOINT ["node", "linkedin_scraper_playwright.js"]
+ENTRYPOINT ["node", "job_scraper.js"]

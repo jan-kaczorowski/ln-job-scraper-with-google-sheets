@@ -1,19 +1,19 @@
 #!/bin/bash
 
-echo "Building LinkedIn Scraper Docker image..."
+echo "Building Job Scraper Docker image..."
 
 # Build the Docker image
-docker build -t linkedin-scraper .
+docker build -t job-scraper .
 
 echo ""
 echo "Build complete! Usage examples:"
 echo ""
-echo "# Using run script:"
-echo "./run_docker.sh -k 'ruby on rails'"
+echo "# LinkedIn scraping:"
+echo "./run_scraper.sh -s linkedin -k 'ruby on rails'"
 echo ""
-echo "# Using docker-compose:"
-echo "docker-compose run --rm scraper -k 'ruby on rails'"
+echo "# HiringCafe scraping:"
+echo "./run_scraper.sh -s hiringcafe -k 'director' -d 'Information Technology'"
 echo ""
-echo "# Using docker directly:"
-echo "docker run -it --rm --ipc=host -v \$(pwd)/scraped_jobs:/app/scraped_jobs -v \$(pwd)/linkedin_creds.json:/app/linkedin_creds.json:ro linkedin-scraper -k 'ruby on rails'"
+echo "# With Google Sheets:"
+echo "./run_scraper.sh -s linkedin -k 'python' --google-sheet 'YOUR_SHEET_ID'"
 echo ""

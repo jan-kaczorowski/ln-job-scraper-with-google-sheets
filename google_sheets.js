@@ -93,14 +93,6 @@ class GoogleSheetsIntegration {
       throw error;
     }
   }
-
-  formatJobForSheet(job) {
-    const created_at = new Date().toISOString();
-    const { offerId, title, company, url, markdown } = job;
-    const status = 'pending';
-    
-    return [created_at, offerId, title, company, url, markdown, status];
-  }
 }
 
 module.exports = GoogleSheetsIntegration;
