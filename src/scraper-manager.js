@@ -5,13 +5,15 @@ const GoogleSheetsIntegration = require('../google_sheets');
 // Import scrapers
 const LinkedInScraper = require('./scrapers/linkedin-scraper');
 const HiringCafeScraper = require('./scrapers/hiringcafe-scraper');
+const EldoradoScraper = require('./scrapers/eldorado-scraper');
 
 class ScraperManager {
   constructor(options) {
     this.options = options;
     this.scrapers = {
       linkedin: LinkedInScraper,
-      hiringcafe: HiringCafeScraper
+      hiringcafe: HiringCafeScraper,
+      eldorado: EldoradoScraper
     };
   }
 

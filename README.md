@@ -1,17 +1,17 @@
 # Universal Job Scraper
 
-A dockerized, modular web scraper for multiple job sites using Playwright and Node.js. Currently supports LinkedIn and HiringCafe, with an extensible architecture for adding more sites. Scrapes job postings, converts them to Markdown, and optionally sends data to Google Sheets.
+A dockerized, modular web scraper for multiple job sites using Playwright and Node.js. Currently supports LinkedIn, HiringCafe, and Eldorado, with an extensible architecture for adding more sites. Scrapes job postings, converts them to Markdown, and optionally sends data to Google Sheets.
 
 ## Features
 
-- 🌐 Multi-site support (LinkedIn, HiringCafe)
+- 🌐 Multi-site support (LinkedIn, HiringCafe, Eldorado)
 - 🔍 Flexible search by keywords and filters
 - 📝 Converts job descriptions to clean Markdown format
 - 🔐 Supports LinkedIn login for better access
 - 📊 Optional Google Sheets integration
 - 🐳 Fully dockerized for easy deployment
 - 🎯 Site-specific filtering options
-- 🆔 Generates unique OfferIDs per site (LN-xxx, HC-xxx)
+- 🆔 Generates unique OfferIDs per site (LN-xxx, HC-xxx, ED-xxx)
 - 🔌 Extensible architecture for adding new sites
 
 ## Quick Start
@@ -60,10 +60,19 @@ A dockerized, modular web scraper for multiple job sites using Playwright and No
 ./run_scraper.sh -s hiringcafe -k "manager" -d "Sales" -n 20
 ```
 
+#### Eldorado Scraping
+```bash
+# Basic search
+./run_scraper.sh -s eldorado -k "developer"
+
+# With Google Sheets
+./run_scraper.sh -s eldorado -k "ruby on rails" --google-sheet "YOUR_SHEET_ID"
+```
+
 ## Options
 
 ### Common Options
-- `-s, --site` - Site to scrape (required: linkedin, hiringcafe)
+- `-s, --site` - Site to scrape (required: linkedin, hiringcafe, eldorado)
 - `-k, --keywords` - Search keywords
 - `-n, --max-jobs` - Maximum jobs to scrape (default: 10)
 - `-o, --output-dir` - Output directory (default: scraped_jobs)
@@ -79,6 +88,9 @@ A dockerized, modular web scraper for multiple job sites using Playwright and No
 ### HiringCafe Options
 - `-d, --departments` - Filter by departments (comma-separated)
 
+### Eldorado Options
+- No site-specific options (uses common keywords parameter)
+
 ## Output
 
 ### Markdown Files
@@ -86,7 +98,7 @@ A dockerized, modular web scraper for multiple job sites using Playwright and No
 Jobs are saved in the `scraped_jobs` directory with metadata including:
 - Scraped timestamp
 - Source site
-- OfferID (format: LN-XXXXXX for LinkedIn, HC-XXXXXX for HiringCafe)
+- OfferID (format: LN-XXXXXX for LinkedIn, HC-XXXXXX for HiringCafe, ED-XXXXXX for Eldorado)
 - Company name
 - Direct job URL
 - Full job description in Markdown
