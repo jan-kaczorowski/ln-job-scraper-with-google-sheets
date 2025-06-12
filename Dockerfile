@@ -12,7 +12,9 @@ RUN npm install
 
 # Copy application files
 COPY linkedin_scraper_playwright.js .
+COPY google_sheets.js .
 COPY linkedin_creds.json* ./
+COPY google_service_account.json* ./
 
 # Create output directory
 RUN mkdir -p scraped_jobs

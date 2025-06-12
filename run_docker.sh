@@ -12,6 +12,7 @@ TIME_RANGE="r604800"
 WORK_TYPE="2"
 FILTERS=""
 NO_ACTIVE=""
+GOOGLE_SHEET=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -48,6 +49,10 @@ while [[ $# -gt 0 ]]; do
       NO_ACTIVE="--no-active-filter"
       shift
       ;;
+    --google-sheet)
+      GOOGLE_SHEET="$2"
+      shift 2
+      ;;
     -h|--help)
       echo "Usage: $0 -k 'keywords' [options]"
       echo "Options:"
@@ -59,6 +64,7 @@ while [[ $# -gt 0 ]]; do
       echo "  -w, --work-type     Work type: 1 (on-site), 2 (remote), 3 (hybrid)"
       echo "  --filters           Custom filter parameters"
       echo "  --no-active-filter  Don't filter for active listings only"
+      echo "  --google-sheet      Google Sheet ID to send data to"
       exit 0
       ;;
     *)
@@ -104,6 +110,10 @@ if [ -n "$NO_ACTIVE" ]; then
   ARGS+=("--no-active-filter")
 fi
 
+if [ -n "$GOOGLE_SHEET" ]; then
+  ARGS+=("--google-sheet" "$GOOGLE_SHEET")
+fi
+
 echo "Command: node linkedin_scraper_playwright.js ${ARGS[@]}"
 
 # Run the Docker container
@@ -111,5 +121,6 @@ docker run -it --rm \
   --ipc=host \
   -v "$(pwd)/scraped_jobs:/app/scraped_jobs" \
   -v "$(pwd)/linkedin_creds.json:/app/linkedin_creds.json:ro" \
+  -v "$(pwd)/google_service_account.json:/app/google_service_account.json:ro" \
   linkedin-scraper \
   node linkedin_scraper_playwright.js "${ARGS[@]}"

@@ -6,6 +6,7 @@ This is a dockerized version of the LinkedIn jobs scraper using Playwright.
 
 - Docker installed on your system
 - `linkedin_creds.json` file with your LinkedIn credentials
+- (Optional) `google_service_account.json` for Google Sheets integration
 
 ## Setup
 
@@ -29,6 +30,9 @@ This is a dockerized version of the LinkedIn jobs scraper using Playwright.
 
 # Custom filters
 ./run_docker.sh -k "ruby on rails" --filters "f_AL=true&f_TPR=r604800&f_WT=2&f_E=2"
+
+# With Google Sheets integration
+./run_docker.sh -k "ruby on rails" --google-sheet "YOUR_SHEET_ID"
 ```
 
 ### Option 2: Using docker-compose
@@ -63,10 +67,22 @@ docker run -it --rm --ipc=host \
   - `3` - Hybrid
 - `--filters` - Custom filter parameters
 - `--no-active-filter` - Don't filter for active listings only
+- `--google-sheet` - Google Sheet ID to send data to (requires setup)
 
 ## Output
 
 Scraped jobs are saved as Markdown files in the `scraped_jobs` directory.
+
+If Google Sheets integration is enabled, data is also sent to the specified Google Sheet with columns:
+- created_at
+- job_title
+- url
+- markdown_content
+- status (always "pending")
+
+## Google Sheets Integration
+
+See [GOOGLE_SHEETS_SETUP.md](GOOGLE_SHEETS_SETUP.md) for detailed setup instructions.
 
 ## Troubleshooting
 
@@ -81,3 +97,9 @@ Scraped jobs are saved as Markdown files in the `scraped_jobs` directory.
 3. If scraping fails:
    - Try running in headful mode to see what's happening
    - Check if LinkedIn has changed their page structure
+   
+
+
+
+## Tested usage:
+`docker run -it --rm --ipc=host -v $(pwd)/scraped_jobs:/app/scraped_jobs -v $(pwd)/linkedin_creds.json:/app/linkedin_creds.json:ro linkedin-scraper -k 'IT director' -n 10 --filters "f_AL=true&f_TPR=r604800&f_WT=2,3&f_E=5" --google-sheet "1EwIinUdGY_XFs6mSKNobjUZwF4ENhbuWHrISxnGcvQk"`

@@ -4,6 +4,7 @@ const { chromium } = require('playwright');
 const fs = require('fs').promises;
 const path = require('path');
 const { program } = require('commander');
+const GoogleSheetsIntegration = require('./google_sheets');
 
 // Parse command line options
 program
@@ -15,6 +16,7 @@ program
   .option('-t, --time-range <range>', 'Time range filter', 'r604800')
   .option('-w, --work-type <type>', 'Work type filter', '2')
   .option('--filters <params>', 'Custom filter parameters')
+  .option('--google-sheet <id>', 'Google Sheet ID to send data to')
   .parse();
 
 const options = program.opts();
@@ -246,6 +248,7 @@ async function scrapeLinkedIn() {
     
     const maxJobs = Math.min(jobLinks.length, parseInt(options.maxJobs));
     const savedJobs = [];
+    const sheetsData = [];
     
     for (let i = 0; i < maxJobs; i++) {
       try {
@@ -316,6 +319,15 @@ async function scrapeLinkedIn() {
         console.log('Saved to:', filepath);
         savedJobs.push(filepath);
         
+        // Collect data for Google Sheets if enabled
+        if (options.googleSheet) {
+          sheetsData.push({
+            title: jobTitle.trim(),
+            url: jobUrl,
+            markdown: markdown
+          });
+        }
+        
         // Small delay between jobs
         await page.waitForTimeout(1000);
         
@@ -326,6 +338,28 @@ async function scrapeLinkedIn() {
     
     console.log('\n' + '='.repeat(50));
     console.log(`Scraping completed! Saved ${savedJobs.length} jobs to ${options.outputDir}/`);
+    
+    // Send to Google Sheets if enabled
+    if (options.googleSheet && sheetsData.length > 0) {
+      console.log('\nSending data to Google Sheets...');
+      const sheets = new GoogleSheetsIntegration();
+      
+      try {
+        const initialized = await sheets.initialize();
+        if (initialized) {
+          // Format data for sheets
+          const rows = sheetsData.map(job => sheets.formatJobForSheet(job));
+          
+          // Append to sheet
+          await sheets.appendToSheet(options.googleSheet, rows);
+          console.log(`Successfully sent ${rows.length} jobs to Google Sheet!`);
+        } else {
+          console.error('Failed to initialize Google Sheets integration');
+        }
+      } catch (error) {
+        console.error('Error sending to Google Sheets:', error.message);
+      }
+    }
     
   } catch (error) {
     console.error('Fatal error:', error);
