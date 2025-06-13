@@ -76,6 +76,35 @@ class EldoradoScraper extends BaseScraper {
     return match ? match[1] : url.split('/').filter(p => p).pop();
   }
 
+  /**
+   * Parse job title and company from combined string
+   * Format: "Job Title @ Company Name"
+   * @param {string} combinedText - The combined title@company string
+   * @returns {Object} Object with title and company properties
+   */
+  parseTitleAndCompany(combinedText) {
+    if (!combinedText) {
+      return { title: '', company: '' };
+    }
+    
+    // Split by @ delimiter
+    const parts = combinedText.split('@').map(part => part.trim());
+    
+    if (parts.length >= 2) {
+      // Normal case: "Title @ Company"
+      return {
+        title: parts[0],
+        company: parts.slice(1).join('@') // In case company name contains @
+      };
+    } else {
+      // No @ found, treat entire string as title
+      return {
+        title: combinedText.trim(),
+        company: ''
+      };
+    }
+  }
+
   async scrape(params) {
     const browser = await chromium.launch({
       headless: !this.options.headful,
@@ -122,28 +151,20 @@ class EldoradoScraper extends BaseScraper {
           // Build full URL
           const jobUrl = href.startsWith('http') ? href : `${this.baseUrl}${href}`;
           
-          // Try to get job title from the row
+          // Try to get combined title@company from the row
           let title = `job_${i + 1}`;
+          let company = '';
+          
           try {
             const titleElement = await row.$('h2, h3, .job-title, .offer-title, [class*="title"]');
             if (titleElement) {
-              title = await titleElement.textContent();
-              title = title.trim();
+              const combinedText = await titleElement.textContent();
+              const parsed = this.parseTitleAndCompany(combinedText);
+              title = parsed.title || title;
+              company = parsed.company;
             }
           } catch (e) {
             console.log('Could not extract title from row');
-          }
-          
-          // Try to get company name from the row
-          let company = '';
-          try {
-            const companyElement = await row.$('.company-name, .employer, [class*="company"]');
-            if (companyElement) {
-              company = await companyElement.textContent();
-              company = company.trim();
-            }
-          } catch (e) {
-            console.log('Could not extract company from row');
           }
           
           jobLinks.push({ url: jobUrl, title, company });
@@ -173,30 +194,20 @@ class EldoradoScraper extends BaseScraper {
             continue;
           }
           
-          // Try to get better title from detail page
+          // Try to get better title and company from detail page
           let title = initialTitle;
+          let company = initialCompany;
+          
           try {
             const titleElement = await page.$('h1, h2.job-title, .offer-title');
             if (titleElement) {
-              const detailTitle = await titleElement.textContent();
-              if (detailTitle) title = detailTitle.trim();
+              const combinedText = await titleElement.textContent();
+              const parsed = this.parseTitleAndCompany(combinedText);
+              if (parsed.title) title = parsed.title;
+              if (parsed.company) company = parsed.company;
             }
           } catch (e) {
             console.log('Using title from listing');
-          }
-          
-          // Try to get company from detail page if not found earlier
-          let company = initialCompany;
-          if (!company) {
-            try {
-              const companyElement = await page.$('.company-name, .employer-name, [class*="company"]');
-              if (companyElement) {
-                company = await companyElement.textContent();
-                company = company.trim();
-              }
-            } catch (e) {
-              console.log('Could not extract company name');
-            }
           }
           
           // Get HTML content and convert to markdown
