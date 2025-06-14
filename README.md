@@ -135,6 +135,41 @@ To add a new job site:
 - [Docker Setup & Usage](README_DOCKER.md)
 - [Google Sheets Integration](GOOGLE_SHEETS_SETUP.md)
 
+## LinkedIn parameter flags
+
+```
+
+f_E=5 – Director-level positions
+
+f_F=sale,mgmt – Sales and Management functions
+
+f_JT=F – Full-time roles only
+
+f_AL=true – Only actively hiring companies
+
+f_EA=true – Easy Apply enabled, makr this false or remove for company website applications
+
+f_JIYN=true – Shows jobs where you have connections (still working out how to display only 2nd level connections as that seems to be the $$ ticket to engagement messages)
+
+f_VJ=true – Only verified jobs (for those that need to feel secure bout bogus job postings, linkedin verfiies the human who created the job post and marks it as verified)
+
+f_TPR=r14400 – Posted within the last 4 hours
+
+f_WT=1,2,3 – On-site, hybrid, remote work types
+
+sortBy=DD – Sort by date (newest first)
+
+distance=25 – Search radius of 25 miles
+
+geoId=103644278 – United States
+
+keywords=Director%20Sales%20Operations – Search for Sales-related roles
+
+
+```
+
+
+
 ## License
 
 MIT
